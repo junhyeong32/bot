@@ -28,10 +28,8 @@ export default function Home() {
       })
         .then((res) => {
           setRunCount(runCount + 1)
-          
-          if(Number(count) === runCount){
-            clearInterval();
-          }  
+          console.log(runCount)
+         
           console.log(res);
         
         })
@@ -39,11 +37,14 @@ export default function Home() {
           console.log(err);
         })
   }) 
-  console.log(Number(minute) * ms)
 
   const getData = () => {
     setInterval(dataReq, Number(minute) * ms)
   }
+
+  if(Number(count) === runCount){
+    clearInterval(getData);
+  }  
  
   return (
     <div>
