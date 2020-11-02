@@ -120,3 +120,11 @@
     flex-direction: column;
   }
 }
+
+.mainContainer{
+  text-align: center;
+}
+
+.input{
+  width: 7em;
+}
