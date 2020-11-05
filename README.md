@@ -1,1 +1,1 @@
-# bot
+#galaxy365 bot
