@@ -2,75 +2,52 @@ const axios = require('axios');
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
+const data = require("../data");
 
-
-router.post("/worker", async (req, res) => {
-    let io = req.app.get('socketio');
-    io.on("connection", (socket) => {
+router.post("/request", async (req, res) => {
+    const { minute, count, firstCharge, secondCharge, callPut } = req.body;
     let reqCount = 0;
-    
-    let interval_getData = null;
-
-    const { minute, count } = req.body;
-    const ms = 60000;
+    let ms = 60000;
 
     const getData = async () => {
-        try {
-            const gaxlaxyInfo = await db.galaxy.findOne(
-                { order: [['id', 'DESC']] }
-            )
-            const orderedAmount = Math.floor(Math.random() * (gaxlaxyInfo.secondCharge - gaxlaxyInfo.firstCharge + 1) + gaxlaxyInfo.firstCharge);
+        let orderedAmount = Math.floor(Math.random() * (secondCharge - firstCharge + 1) + firstCharge);
+        let term = 1;
+        let now = new Date().getTime();
+        let expireTime = now - (now % 60000) + (60000 * term);
+        const galaxyReq = await axios.post('https://api.galaxy365.biz/api/v1/trade/create', {
+            optionCode: 'Bitcoin',
+            expireTime: expireTime,
+            orderedAmount: orderedAmount,
+            currency: 840,
+            callPut: callPut,
+            minute: minute,
+            count: count
+        })
+        
+        const createNewData = await db.galaxydata.create({
+            optionCode: 'Bitcoin',
+            expireTime: expireTime,
+            orderedAmount: orderedAmount,
+            currency: 840,
+            callPut: callPut,
+            result: galaxyReq.status
+        })
 
-            if (gaxlaxyInfo) {
-                const galaxyReq = await axios.post('https://api.galaxy365.biz/api/v1/trade/create', {
-                    optionCode: gaxlaxyInfo.optionCode,
-                    expireTime: gaxlaxyInfo.expireTime,
-                    orderedAmount: orderedAmount,
-                    currency: gaxlaxyInfo.currency,
-                    callPut: gaxlaxyInfo.callPut
-                })
+        reqCount++;
+        
+        if (reqCount === Number(count)) {
+            console.log("생성 완료")
+            res.json({ result: '생성완료' })
+            clearInterval(interval_getData)
+            reqCount = 0
 
-                const createNewData = await db.galaxytrade.create({
-                    optionCode: gaxlaxyInfo.optionCode,
-                    expireTime: gaxlaxyInfo.expireTime,
-                    orderedAmount: orderedAmount,
-                    currency: gaxlaxyInfo.currency,
-                    callPut: gaxlaxyInfo.callPut,
-                    result: galaxyReq.status
-                })
-
-                
-                io.emit("newDataToClient", createNewData);
-                reqCount += 1;
-               
-                
-                if (Number(count) === Number(reqCount)) {
-                    console.log("데이터 생성끝")
-                    reqCount = 0;
-                    
-                        socket.emit("disconnect", "끝")
-                        socket.on("disconnect", () => {
-                            console.log("연결 끊김")
-                        });
-                   
-                   
-                    clearInterval(interval_getData);
-                }
-            // return res.json({ data: createNewData})
-            }
-        } catch (error) {
-            console.log(error);
-            res.sendStatus(500);
         }
+
+        data.set([...data.get(), createNewData]);
     }
 
-    try {
-        getData();
-        interval_getData = setInterval(getData, Number(minute) * ms);
-    } catch (error) {
-        console.log(err);
-    }
-});
+    getData();
+    interval_getData = setInterval(getData, Number(minute) * ms);
 })
 
 

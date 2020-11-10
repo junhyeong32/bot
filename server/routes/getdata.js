@@ -5,7 +5,7 @@ const db = require('../models');
 
 router.post("/getdata", async (req, res) => {
     try {
-        const allData = await db.galaxytrade.findAll(
+        const allData = await db.galaxydata.findAll(
             { order: [['id', 'DESC']] }
         );
         return res.status(200).json({ data: allData })

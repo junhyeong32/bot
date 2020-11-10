@@ -1,27 +1,16 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('galaxies', {
+    await queryInterface.createTable('galaxydata', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      setMinute: {
-        type: Sequelize.STRING
-      },
-      setCount: {
-        type: Sequelize.INTEGER
-      },
-      firstCharge: {
-        type: Sequelize.INTEGER
-      },
-      secondCharge: {
-        type: Sequelize.INTEGER
-      },
       optionCode: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        default:"Bitcoin"
       },
       expireTime: {
         type: Sequelize.BIGINT
@@ -34,6 +23,9 @@ module.exports = {
         default: 840
       },
       callPut: {
+        type: Sequelize.INTEGER
+      },
+      result: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -47,6 +39,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('galaxies');
+    await queryInterface.dropTable('galaxydata');
   }
 };
