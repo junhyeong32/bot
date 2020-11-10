@@ -18,9 +18,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false)
 
-  let term = 1;
-  let now = new Date().getTime();
-  let expireTime = now - (now % 60000) + (60000 * term);
+
 
   const sendData = useCallback(async () => {
     setLoading(true)
@@ -29,7 +27,6 @@ export default function Home() {
       count: count,
       firstCharge: firstCharge,
       secondCharge: secondCharge,
-      expireTime: expireTime,
       callPut: callPut,
     })
       .then((res) => {
@@ -66,7 +63,13 @@ export default function Home() {
   return (
     <div className={styles.mainContainer}>
       <div className={styles.inputMainContainer}>
+        <div className={styles.textSize}>
+            optionCode default value: 'Bitcoin',<br />
+            currency default value: 840,<br />
+            데이터 갱신<br />
+        </div>
         <div className={styles.inputContainer}>
+
           <div>
             <Input type="text" className={styles.input} value={minute} onChange={(e => { setMinute(e.target.value) })}></Input>분 마다
           </div>
@@ -78,9 +81,9 @@ export default function Home() {
             <Input type="number" className={styles.input} value={secondCharge} onChange={(e => { setSecondCharge(e.target.value) })}></Input> 금액으로<br />
           </div>
           <Select className={styles.input} defaultValue="Call" value={callPut} onChange={handleChange}>
-              <Option value={"1"}>Call</Option>
-              <Option value={-"1"}>Put</Option>
-            </Select>
+            <Option value={"1"}>Call</Option>
+            <Option value={-"1"}>Put</Option>
+          </Select>
         </div>
         <Button onClick={sendData} loading={loading} className={styles.input} >요청</Button>
       </div>

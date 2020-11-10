@@ -133,9 +133,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 15px;
 }
 
 .inputContainer{
   display: flex;
   justify-content: space-evenly;
+  margin-bottom: 15px;
+}
+
+.textSize{
+  font-size: large;
+  border-bottom: 1px solid gray;
+  margin-bottom: 4px;
 }
